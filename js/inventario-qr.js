@@ -1,3 +1,7 @@
+// ==================== CONFIGURACIÓN DEL BACKEND ====================
+const GOOGLE_SHEET_URL = '/api/submit';
+const API_TOKEN = 'inventario2024seguro'; // El mismo que pusiste en api/index.py
+
 // ==================== MODELOS ====================
 class Product {
     constructor(id, name, price, tax = 0, code = '') {
@@ -15,10 +19,8 @@ class CartItem {
 }
 
 // ==================== ESTADO ====================
-const GOOGLE_SHEET_URL = '/api/submit';
-const API_TOKEN = 'inventario2024seguro'; // o la frase que uses
-let clientFirstname = '', clientLastname = '';
-let clientEmail    = '', clientDUI     = '', clientPhone = '';
+let cart = [];
+let clientFirstname = '', clientLastname = '', clientEmail = '', clientDUI = '', clientPhone = '';
 let lastScanTime = 0;
 let html5QrCode = null;
 
@@ -99,9 +101,8 @@ function updateCreateButton() {
         clientFirstname.trim() !== '' &&
         clientLastname.trim()  !== '' &&
         clientDUI.trim()       !== '' &&
-        clientPhone.trim()     !== '' &&
-        cart.length > 0;
-    btn.disabled = !clientValid;
+        clientPhone.trim()     !== '';
+    btn.disabled = !(cart.length > 0 && clientValid);
 }
 
 // ==================== CARRITO ====================
@@ -213,7 +214,7 @@ function switchTab(tabId) {
     document.getElementById(`seccion-${tabId}`).classList.add('active');
 }
 
-// ==================== 🆕 ENVIAR A GOOGLE SHEETS ====================
+// ==================== ENVIAR PEDIDO (BACKEND VERCEL) ====================
 async function createDraftOrder() {
     if (cart.length === 0 || 
         !clientFirstname.trim() || !clientLastname.trim() ||
@@ -246,13 +247,17 @@ async function createDraftOrder() {
     try {
         const response = await fetch(GOOGLE_SHEET_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-token': API_TOKEN
+            },
             body: JSON.stringify(datos)
         });
         const result = await response.json();
         
         if (result.success) {
             showToast('✅ Pedido guardado en Google Sheets');
+            // Limpiar todo
             cart = [];
             document.getElementById('clientFirstname').value = '';
             document.getElementById('clientLastname').value = '';
@@ -298,6 +303,5 @@ window.addEventListener('load', () => {
         clientPhone = e.target.value;
         updateCreateButton();
     });
-
     renderAll();
 });
