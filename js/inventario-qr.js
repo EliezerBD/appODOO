@@ -16,7 +16,7 @@ class CartItem {
 
 // ==================== ESTADO ====================
 const GOOGLE_SHEET_URL = '/api/submit';
-const API_TOKEN = 'secreto_super_seguro'; // El mismo que pusiste en api/index.py
+const API_TOKEN = 'inventario2024seguro'; // o la frase que uses
 let clientFirstname = '', clientLastname = '';
 let clientEmail    = '', clientDUI     = '', clientPhone = '';
 let lastScanTime = 0;
