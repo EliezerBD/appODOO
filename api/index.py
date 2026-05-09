@@ -16,7 +16,7 @@ cliente_gs = gspread.authorize(creds)
 
 HOJA_ID = "1vb42AMPeRonYe9oSQ_C_nOTjWuGBER7zvXg5KXjE1QE"
 HOJA_NOMBRE = "SALIDA"
-API_TOKEN = os.environ.get("API_TOKEN", "inventario2024seguro")
+API_TOKEN = "inventario2024seguro"
 
 @app.route("/api/submit", methods=["POST", "OPTIONS"])
 def guardar_pedido():
