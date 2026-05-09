@@ -1,6 +1,6 @@
 // ==================== CONFIGURACIÓN DEL BACKEND ====================
 const GOOGLE_SHEET_URL = '/api/submit';
-const API_TOKEN = 'inventario2024seguro'; // El mismo que pusiste en api/index.py
+const API_TOKEN = 'inventario2024seguro';// El mismo que pusiste en api/index.py
 
 // ==================== MODELOS ====================
 class Product {
