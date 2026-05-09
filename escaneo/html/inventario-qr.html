@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>InventarioApp - QR Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="../css/inventario-qr.css">
+</head>
+
+<body>
+    <div class="app">
+        <div class="topbar">
+            <h1>🧾 InventarioApp</h1>
+            <p>Escanea QR · Crea pedido Odoo</p>
+        </div>
+
+        <div class="radio-inputs">
+            <label class="radio">
+                <input type="radio" name="tab" value="camara" checked onchange="switchTab('camara')">
+                <span class="name">📷 Cámara</span>
+            </label>
+            <label class="radio">
+                <input type="radio" name="tab" value="carrito" onchange="switchTab('carrito')">
+                <span class="name">🛒 Carrito</span>
+            </label>
+            <label class="radio">
+                <input type="radio" name="tab" value="cliente" onchange="switchTab('cliente')">
+                <span class="name">👤 Cliente</span>
+            </label>
+        </div>
+
+        <div class="content">
+            <div id="seccion-camara" class="section active">
+                <div class="card">
+                    <div class="card-title">📷 Escáner QR</div>
+                    <div class="camera-container" id="cameraContainer">
+                        <div id="qrReader"></div>
+                        <div class="camera-placeholder" id="cameraPlaceholder">
+                            <span style="font-size:48px;">📸</span>
+                            <span>Presiona "Activar cámara" para escanear</span>
+                        </div>
+                        <div class="scan-flash" id="scanFlash">✅</div>
+                    </div>
+                    <div class="camera-controls">
+                        <button id="btnActivateCamera" onclick="startCamera()">📷 Activar cámara</button>
+                        <button id="btnStopCamera" class="secondary" onclick="stopCamera()" disabled>⏹️ Apagar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="seccion-carrito" class="section">
+                <div class="card">
+                    <div class="card-title">🛒 Carrito <span id="cartCount" style="font-weight:normal; font-size:0.9rem; color:var(--on-surface-variant);">(0)</span></div>
+                    <div id="cartContainer">
+                        <div class="empty-cart" id="emptyCartMsg">No hay productos aún. Escanea un código para empezar.</div>
+                    </div>
+                    <div class="cart-total" id="cartTotalRow" style="display: none;">
+                        <span>Total</span>
+                        <span class="total-amount" id="totalPriceDisplay">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="seccion-cliente" class="section">
+                <form class="form" style="max-width: 100%; width: 100%; box-sizing: border-box; margin: 0 auto;">
+                    <p class="title">Register </p>
+                    <p class="message">Signup now and get full access to our app. </p>
+                    <div class="flex">
+                        <label>
+                            <input class="input" type="text" placeholder="" required="" id="clientFirstname">
+                            <span>Firstname</span>
+                        </label>
+                        <label>
+                            <input class="input" type="text" placeholder="" required="" id="clientLastname">
+                            <span>Lastname</span>
+                        </label>
+                    </div>
+                    <label>
+                        <input class="input" type="email" placeholder="" required="" id="clientEmail">
+                        <span>Email</span>
+                    </label>
+                    <label>
+                        <input class="input"  placeholder="" required="" id="clientPassword">
+                        <span>DUI</span>
+                    </label>
+                    <label>
+                        <input class="input"  placeholder="" required="" id="clientConfirmPassword">
+                        <span>Numero de telefono</span>
+                    </label>
+                    <button class="submit" type="button" onclick="event.preventDefault();">Submit</button>
+                    <p class="signin">Already have an acount ? <a href="#">Signin</a> </p>
+                </form>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="btn-order" id="btnCreateOrder" disabled onclick="createDraftOrder()">
+                🚀 Crear Pedido en Odoo (Borrador)
+            </button>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+    <script src="../js/inventario-qr.js"></script>
+</body>
+
+</html>
