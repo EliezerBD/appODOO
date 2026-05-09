@@ -15,7 +15,7 @@ creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
 cliente = gspread.authorize(creds)
 
 HOJA_ID = "1vb42AMPeRonYe9oSQ_C_nOTjWuGBER7zvXg5KXjE1QE"
-HOJA_NOMBRE = "salidas"
+HOJA_NOMBRE = "SALIDAS"
 API_TOKEN = "inventario2024seguro"
 
 @app.route("/api/submit", methods=["POST", "OPTIONS"])
