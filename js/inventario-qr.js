@@ -1,6 +1,5 @@
 // ==================== CONFIGURACIÓN DEL BACKEND ====================
 const GOOGLE_SHEET_URL = '/api/submit';
-const API_TOKEN = 'inventario2024seguro';// El mismo que pusiste en api/index.py
 
 // ==================== MODELOS ====================
 class Product {
@@ -248,8 +247,7 @@ async function createDraftOrder() {
         const response = await fetch(GOOGLE_SHEET_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'x-api-token': API_TOKEN
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(datos)
         });
@@ -262,8 +260,8 @@ async function createDraftOrder() {
             document.getElementById('clientFirstname').value = '';
             document.getElementById('clientLastname').value = '';
             document.getElementById('clientEmail').value = '';
-            document.getElementById('clientPassword').value = '';
-            document.getElementById('clientConfirmPassword').value = '';
+            document.getElementById('clientDUI').value = '';
+            document.getElementById('clientPhone').value = '';
             clientFirstname = ''; clientLastname = '';
             clientEmail = ''; clientDUI = ''; clientPhone = '';
             renderAll();
@@ -295,11 +293,11 @@ window.addEventListener('load', () => {
         clientEmail = e.target.value;
         updateCreateButton();
     });
-    document.getElementById('clientPassword').addEventListener('input', e => {
+    document.getElementById('clientDUI').addEventListener('input', e => {
         clientDUI = e.target.value;
         updateCreateButton();
     });
-    document.getElementById('clientConfirmPassword').addEventListener('input', e => {
+    document.getElementById('clientPhone').addEventListener('input', e => {
         clientPhone = e.target.value;
         updateCreateButton();
     });

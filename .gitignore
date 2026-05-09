@@ -1,3 +1,4 @@
 # Credenciales y secretos
 credenciales.json
 *.json
+!vercel.json

@@ -248,6 +248,12 @@ body {
 }
 
 /* Carrito */
+#cartContainer {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 5px; /* Para que la barra de desplazamiento no pegue al borde */
+}
+
 .cart-item {
     display: flex;
     align-items: center;
