@@ -9,17 +9,22 @@ from google.oauth2.service_account import Credentials
 app = Flask(__name__)
 CORS(app)
 
-creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS_JSON"])
-scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
-cliente_gs = gspread.authorize(creds)
+# Credenciales desde variable de entorno (obligatoria en Vercel)
+try:
+    creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS_JSON"])
+    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    cliente_gs = gspread.authorize(creds)
+except Exception as e:
+    print("ERROR FATAL: No se pudo autenticar con Google Sheets:", str(e))
+    cliente_gs = None
 
 HOJA_ID = "1vb42AMPeRonYe9oSQ_C_nOTjWuGBER7zvXg5KXjE1QE"
-HOJA_NOMBRE = "SALIDA"
 API_TOKEN = "inventario2024seguro"
 
 @app.route("/api/submit", methods=["POST", "OPTIONS"])
 def guardar_pedido():
+    # Responder a preflight CORS
     if request.method == "OPTIONS":
         response = jsonify({"status": "ok"})
         response.headers["Access-Control-Allow-Origin"] = "*"
@@ -27,19 +32,31 @@ def guardar_pedido():
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, x-api-token"
         return response
 
+    # Verificar token
     token = request.headers.get("x-api-token")
     if token != API_TOKEN:
         return jsonify({"success": False, "error": "Token inválido"}), 403
+
+    if cliente_gs is None:
+        return jsonify({"success": False, "error": "Backend no autenticado con Google Sheets. Revisa credenciales."}), 500
 
     try:
         datos = request.get_json()
         cliente_datos = datos["cliente"]
         carrito = datos["carrito"]
 
-        hoja = cliente_gs.open_by_key(HOJA_ID).worksheet(HOJA_NOMBRE)
+        libro = cliente_gs.open_by_key(HOJA_ID)
+        
+        # Obtener la hoja exacta (mayúsculas/minúsculas exactas)
+        try:
+            hoja = libro.worksheet("SALIDA")  # <-- CAMBIA AQUÍ si tu hoja se llama diferente
+        except gspread.exceptions.WorksheetNotFound:
+            # Si no existe, la crea con el nombre "SALIDA"
+            hoja = libro.add_worksheet(title="SALIDA", rows="1000", cols="20")
+            hoja.append_row(["Fecha", "Nombre", "Apellido", "Email", "DUI", "Teléfono", "Producto", "Precio", "Cantidad", "Subtotal"])
+
         fecha = datetime.now().strftime("%Y-%m-%d")
 
-        # Recorremos cada producto y añadimos una fila
         for item in carrito:
             fila = [
                 fecha,
@@ -57,5 +74,7 @@ def guardar_pedido():
 
         return jsonify({"success": True})
     except Exception as e:
-        print("Error:", str(e))
-        return jsonify({"success": False, "error": str(e)}), 500
+        # Capturar cualquier error y mostrarlo
+        mensaje = str(e)
+        print("ERROR en guardar_pedido:", mensaje)
+        return jsonify({"success": False, "error": mensaje}), 500
