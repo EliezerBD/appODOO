@@ -53,7 +53,7 @@ function renderCart() {
     const totalDisplay = document.getElementById('totalPriceDisplay');
 
     if (cart.length === 0) {
-        container.innerHTML = '<div class="empty-cart text-center text-on-surface-variant p-lg" id="emptyCartMsg">No products yet. Scan a barcode to begin.</div>';
+        container.innerHTML = '<div class="empty-cart text-center text-on-surface-variant p-lg" id="emptyCartMsg">No produtos en el carrito</div>';
         countSpan.textContent = '(0) ITEMS';
         totalRow.style.display = 'none';
         return;
@@ -270,7 +270,7 @@ async function createDraftOrder() {
         const result = await response.json();
         
         if (result.success) {
-            showToast('✅ Pedido guardado en Google Sheets');
+            showToast(' Pedido guardado en Google Sheets');
             // Limpiar todo
             cart = [];
             document.getElementById('first_name').value = '';
