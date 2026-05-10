@@ -8,6 +8,9 @@ function switchTab(tabId, buttonElement) {
     // Mostrar la pestaña seleccionada
     const selectedTab = document.getElementById(tabId);
     if (selectedTab) {
+        // Detener cámara si está activa al cambiar de pestaña
+        if (typeof stopCamera === 'function') stopCamera();
+        
         selectedTab.classList.add('active');
         selectedTab.classList.add('animate-fadeIn');
     }

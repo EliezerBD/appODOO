@@ -50,7 +50,7 @@ def guardar_pedido():
         
         # Obtener la hoja exacta (mayúsculas/minúsculas exactas)
         try:
-            hoja = libro.worksheet("SALIDA")  # <-- CAMBIA AQUÍ si tu hoja se llama diferente
+            hoja = libro.worksheet("SALIDA") # Intentar obtener la hoja "SALIDA"
         except gspread.exceptions.WorksheetNotFound:
             # Si no existe, la crea con el nombre "SALIDA"
             hoja = libro.add_worksheet(title="SALIDA", rows="1000", cols="20")

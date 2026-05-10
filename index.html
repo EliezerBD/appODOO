@@ -198,6 +198,111 @@
             </div>
         </div>
 
+        <!-- Pantalla 4: Almacén -->
+        <div id="almacenTab" class="tab-content animate-fadeIn space-y-lg">
+            <div class="glass-card light-catch rounded-xl p-lg text-center space-y-md shadow-2xl">
+                <div class="flex items-center justify-center gap-sm mb-sm">
+                    <span class="material-symbols-outlined text-secondary text-[32px]">inventory</span>
+                    <h2 class="font-headline-md text-headline-md text-on-surface">Gestión de Almacén</h2>
+                </div>
+                
+                <div class="w-full h-64 rounded-lg bg-surface-container-highest flex items-center justify-center border-2 border-dashed border-outline-variant relative overflow-hidden"
+                    id="almacenCameraContainer">
+                    <div id="almacenQrReader" style="width: 100%; height: 100%; display: none;"></div>
+                    <div class="camera-placeholder flex flex-col items-center justify-center absolute inset-0 text-outline"
+                        id="almacenCameraPlaceholder">
+                        <span class="material-symbols-outlined text-[48px] mb-xs">photo_camera</span>
+                        <span class="font-body-sm text-body-sm">Preciona encender cámara</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-sm mt-md">
+                    <button id="btnActivateAlmacenCamera"
+                        class="flex-1 py-sm bg-primary/20 text-primary border border-primary/30 rounded-lg hover:bg-primary/30 active:scale-95 transition-all font-title-sm"
+                        onclick="startCamera('almacenQrReader')">Encender Cámara</button>
+                    <button id="btnStopAlmacenCamera"
+                        class="flex-1 py-sm bg-surface-variant text-on-surface-variant rounded-lg active:scale-95 transition-all font-title-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        onclick="stopCamera()" disabled>Detener</button>
+                </div>
+            </div>
+
+            <!-- Formulario de Entrada de Stock (se llena al escanear o manual) -->
+            <div id="almacenForm" class="glass-card light-catch rounded-xl p-lg shadow-2xl mt-md">
+                <h3 class="font-title-lg text-title-lg text-secondary border-b border-white/5 pb-sm mb-md">Datos de Ingreso</h3>
+                
+                <div class="group">
+                    <input required type="text" class="input" id="almacenProductName">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Nombre o Código del Producto</label>
+                </div>
+
+                <div class="group">
+                    <input required type="number" class="input" id="almacenQuantity" min="1" value="1">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Cantidad</label>
+                </div>
+
+                <div class="select" id="almacenBodegaSelect">
+                  <div
+                    class="selected"
+                    data-default="Seleccionar bodega"
+                    data-one="Bodega 1"
+                    data-two="Bodega 2"
+                    data-three="Bodega 3"
+                    data-four="Bodega 4"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="1em"
+                      viewBox="0 0 512 512"
+                      class="arrow"
+                    >
+                      <path
+                        d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div class="options">
+                    <div title="Bodega 1">
+                      <input id="bodega1" name="bodega" type="radio" value="1" />
+                      <label class="option" for="bodega1" data-txt="Bodega 1"></label>
+                    </div>
+                    <div title="Bodega 2">
+                      <input id="bodega2" name="bodega" type="radio" value="2" />
+                      <label class="option" for="bodega2" data-txt="Bodega 2"></label>
+                    </div>
+                    <div title="Bodega 3">
+                      <input id="bodega3" name="bodega" type="radio" value="3" />
+                      <label class="option" for="bodega3" data-txt="Bodega 3"></label>
+                    </div>
+                    <div title="Bodega 4">
+                      <input id="bodega4" name="bodega" type="radio" value="4" />
+                      <label class="option" for="bodega4" data-txt="Bodega 4"></label>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="w-full py-md bg-secondary text-on-secondary font-title-sm text-title-sm rounded-xl glow-secondary active:scale-[0.98] transition-all flex items-center justify-center gap-sm mt-md shadow-lg"
+                    onclick="submitStock()">
+                    <span>ENVIAR AL ALMACÉN</span>
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </div>
+
+            <!-- Card Lista de Inventario -->
+            <div class="list-card mt-lg shadow-2xl">
+                <div class="list-header">
+                    <span>Últimos registros</span>
+                    <span style="font-size: 12px; color: #666;">Total items: <span id="totalCount">0</span></span>
+                </div>
+                <ul id="inventarioList">
+                    <li style="text-align:center; color:#555; font-size:14px; padding: 15px 0;">Aún no hay productos registrados.</li>
+                </ul>
+            </div>
+        </div>
+
     </main>
 
     <!-- BottomNavBar unificada -->
@@ -225,6 +330,16 @@
             data-tab="customersTab" onclick="switchTab('customersTab', this)">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
             <span class="font-label-caps text-label-caps mt-xs">Clientes</span>
+        </button>
+
+        <!-- Botón Almacén -->
+        <button
+            class="flex flex-col items-center justify-center text-on-surface-variant px-md py-xs hover:bg-white/5 transition-colors active:scale-90 nav-btn"
+            data-tab="almacenTab" onclick="switchTab('almacenTab', this)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="m21.5,1H2.5C1.122,1,0,2.122,0,3.5v19.5h24V3.5c0-1.378-1.122-2.5-2.5-2.5Zm1.5,21H1V3.5c0-.827.673-1.5,1.5-1.5h19c.827,0,1.5.673,1.5,1.5v18.5ZM9,6h11v1h-11v-1Zm-3,.5c0,.552-.448,1-1,1s-1-.448-1-1,.448-1,1-1,1,.448,1,1Zm3,5h11v1h-11v-1Zm-3,.5c0,.552-.448,1-1,1s-1-.448-1-1,.448-1,1-1,1,.448,1,1Zm3,5h11v1h-11v-1Zm-3,.5c0,.552-.448,1-1,1s-1-.448-1-1,.448-1,1-1,1,.448,1,1Z"/>
+            </svg>
+            <span class="font-label-caps text-label-caps mt-xs">Almacén</span>
         </button>
     </nav>
 

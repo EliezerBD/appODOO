@@ -156,6 +156,16 @@ function processScannedText(text) {
     if (now - lastScanTime < 1500) return;
     lastScanTime = now;
 
+    // Verificar en qué pestaña estamos para saber qué lógica aplicar
+    const activeTab = document.querySelector('.tab-content.active');
+    if (activeTab && activeTab.id === 'almacenTab') {
+        processAlmacenScan(text);
+    } else {
+        processOrderScan(text);
+    }
+}
+
+function processOrderScan(text) {
     try {
         const obj = JSON.parse(text);
         if (obj.id && obj.name && obj.price !== undefined) {
@@ -166,6 +176,22 @@ function processScannedText(text) {
     } catch (e) { }
     const product = new Product(Date.now(), text.trim() || "Producto escaneado", 0.01, 0, '');
     addProduct(product);
+}
+
+function processAlmacenScan(text) {
+    flashEffect();
+    let productName = text.trim();
+    try {
+        const obj = JSON.parse(text);
+        if (obj.name) productName = obj.name;
+    } catch (e) { }
+    
+    document.getElementById('almacenProductName').value = productName;
+    document.getElementById('almacenForm').style.display = 'block';
+    showToast(`📸 Escaneado: ${productName}`);
+    
+    // Scroll al formulario
+    document.getElementById('almacenForm').scrollIntoView({ behavior: 'smooth' });
 }
 
 function addProduct(product) {
@@ -182,30 +208,29 @@ function addProduct(product) {
 }
 
 // ==================== CÁMARA REAL ====================
-function startCamera() {
+function startCamera(readerId = 'qrReader') {
     if (html5QrCode) stopCamera();
-    document.getElementById('qrReader').style.display = 'block';
-    document.getElementById('qrReader').classList.add('active');
-    document.getElementById('cameraPlaceholder').style.display = 'none';
-    document.getElementById('btnActivateCamera').disabled = true;
-    document.getElementById('btnStopCamera').disabled = false;
+    
+    const isAlmacen = readerId === 'almacenQrReader';
+    const readerElement = document.getElementById(readerId);
+    const placeholderId = isAlmacen ? 'almacenCameraPlaceholder' : 'cameraPlaceholder';
+    const btnStartId = isAlmacen ? 'btnActivateAlmacenCamera' : 'btnActivateCamera';
+    const btnStopId = isAlmacen ? 'btnStopAlmacenCamera' : 'btnStopCamera';
 
-    html5QrCode = new Html5Qrcode("qrReader");
+    readerElement.style.display = 'block';
+    readerElement.classList.add('active');
+    document.getElementById(placeholderId).style.display = 'none';
+    document.getElementById(btnStartId).disabled = true;
+    document.getElementById(btnStopId).disabled = false;
+
+    html5QrCode = new Html5Qrcode(readerId);
     html5QrCode.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 250, height: 250 } },
         (decodedText) => {
             processScannedText(decodedText);
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode = null;
-                    document.getElementById('btnActivateCamera').disabled = false;
-                    document.getElementById('btnStopCamera').disabled = true;
-                    document.getElementById('qrReader').style.display = 'none';
-                    document.getElementById('qrReader').classList.remove('active');
-                    document.getElementById('cameraPlaceholder').style.display = 'flex';
-                });
-            }
+            // Detener cámara después de escanear para confirmar datos
+            stopCamera();
         },
         (error) => { }
     ).catch(err => {
@@ -216,13 +241,33 @@ function startCamera() {
 
 function stopCamera() {
     if (html5QrCode) {
-        html5QrCode.stop().then(() => html5QrCode = null).catch(() => { });
+        html5QrCode.stop().then(() => {
+            html5QrCode = null;
+            // Resetear UI de ambos posibles scanners
+            ['qrReader', 'almacenQrReader'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.display = 'none';
+                    el.classList.remove('active');
+                }
+            });
+            
+            const p1 = document.getElementById('cameraPlaceholder');
+            if (p1) p1.style.display = 'flex';
+            const p2 = document.getElementById('almacenCameraPlaceholder');
+            if (p2) p2.style.display = 'flex';
+
+            const b1 = document.getElementById('btnActivateCamera');
+            if (b1) b1.disabled = false;
+            const b2 = document.getElementById('btnActivateAlmacenCamera');
+            if (b2) b2.disabled = false;
+
+            const s1 = document.getElementById('btnStopCamera');
+            if (s1) s1.disabled = true;
+            const s2 = document.getElementById('btnStopAlmacenCamera');
+            if (s2) s2.disabled = true;
+        }).catch(() => { });
     }
-    document.getElementById('qrReader').style.display = 'none';
-    document.getElementById('qrReader').classList.remove('active');
-    document.getElementById('cameraPlaceholder').style.display = 'flex';
-    document.getElementById('btnActivateCamera').disabled = false;
-    document.getElementById('btnStopCamera').disabled = true;
 }
 
 // ==================== CAMBIO DE PESTAÑAS ====================
@@ -295,6 +340,103 @@ async function createDraftOrder() {
     }
 }
 
+// ==================== GESTIÓN DE ALMACÉN (BACKEND) ====================
+let inventarioBodegas = JSON.parse(localStorage.getItem('inventarioDataBodegas')) || [];
+
+function renderizarInventario() {
+    const inventarioList = document.getElementById('inventarioList');
+    const totalCount = document.getElementById('totalCount');
+    if (!inventarioList) return;
+
+    inventarioList.innerHTML = '';
+    if (inventarioBodegas.length === 0) {
+        inventarioList.innerHTML = '<li style="text-align:center; color:#555; font-size:14px; padding: 15px 0;">Aún no hay productos registrados.</li>';
+        totalCount.textContent = '0';
+        return;
+    }
+
+    const inventarioInvertido = [...inventarioBodegas].reverse();
+    
+    inventarioInvertido.forEach((item) => {
+        const li = document.createElement('li');
+        li.className = 'item-inventario';
+        li.innerHTML = `
+            <div class="item-info">
+                <span class="item-nombre">${item.producto}</span>
+                <span class="item-bodega">Bodega ${item.bodega}</span>
+            </div>
+            <span class="item-cantidad">${item.cantidad} uds</span>
+        `;
+        inventarioList.appendChild(li);
+    });
+    
+    totalCount.textContent = inventarioBodegas.length;
+}
+
+async function submitStock() {
+    const productName = document.getElementById('almacenProductName').value;
+    const quantity = document.getElementById('almacenQuantity').value;
+    const bodegaRadio = document.querySelector('input[name="bodega"]:checked');
+    const bodega = bodegaRadio ? bodegaRadio.value : '';
+
+    if (!productName.trim() || !quantity || quantity <= 0) {
+        showToast('⚠️ Completa el nombre y una cantidad válida');
+        return;
+    }
+
+    if (!bodega || !['1','2','3','4'].includes(bodega)) {
+        showToast('⚠️ Por favor, selecciona una bodega válida.');
+        return;
+    }
+
+    const btn = document.querySelector('#almacenForm button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span>Enviando...</span><span class="material-symbols-outlined animate-spin">sync</span>';
+    btn.disabled = true;
+
+    const datos = {
+        tipo: 'ALMACEN',
+        producto: productName.trim(),
+        cantidad: parseInt(quantity),
+        bodega: bodega,
+        fecha: new Date().toLocaleString()
+    };
+
+    try {
+        const response = await fetch(GOOGLE_SHEET_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('✅ Stock registrado correctamente');
+            
+            // Agregar el nuevo item localmente
+            inventarioBodegas.push({
+                producto: productName.trim(),
+                cantidad: parseInt(quantity),
+                bodega: bodega
+            });
+            localStorage.setItem('inventarioDataBodegas', JSON.stringify(inventarioBodegas));
+            renderizarInventario();
+
+            document.getElementById('almacenProductName').value = '';
+            document.getElementById('almacenQuantity').value = '1';
+            if (bodegaRadio) bodegaRadio.checked = false;
+        } else {
+            showToast('❌ Error: ' + (result.error || 'desconocido'));
+        }
+    } catch (error) {
+        console.error(error);
+        showToast('⚠️ Error de conexión. Revisa el backend.');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
 window.saveCustomer = function() {
     if (!clientFirstName.trim() || !clientLastName.trim() || !clientEmail.trim()) {
         showToast('Completa Nombre, Apellido y Email');
@@ -345,4 +487,7 @@ window.addEventListener('load', () => {
     }
     
     renderAll();
+    if (typeof renderizarInventario === 'function') {
+        renderizarInventario();
+    }
 });
