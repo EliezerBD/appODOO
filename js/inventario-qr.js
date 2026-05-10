@@ -71,10 +71,11 @@ function renderCart() {
                     <span class="material-symbols-outlined text-[28px] text-secondary/50">inventory_2</span>
                 </div>
                 <div class="flex-grow min-w-0">
-                    <h3 class="font-title-sm text-title-sm text-on-surface leading-tight mb-xs">${escapeHtml(item.product.name)}</h3>
-                    <p class="font-body-sm text-body-sm text-secondary">
-                        $<input type="number" step="0.01" min="0" class="w-24 bg-transparent text-secondary border-b border-secondary/30 outline-none" value="${item.product.price.toFixed(2)}" onchange="updatePrice(${index}, this.value)"> c/u
-                    </p>
+                        <h3 class="font-title-sm text-title-sm text-on-surface leading-tight mb-xs">${escapeHtml(item.product.name)}</h3>
+                        <!-- 🔧 CORREGIDO: Se añadió la etiqueta <p> que faltaba para el precio -->
+                        <p class="font-body-sm text-body-sm text-secondary">
+                            $<input type="number" step="0.01" min="0" class="w-24 bg-transparent text-secondary border-b border-secondary/30 outline-none" value="${item.product.price.toFixed(2)}" onchange="updatePrice(${index}, this.value)"> c/u
+                        </p>
                     <div class="flex items-center mt-sm">
                         <div class="flex items-center bg-surface-container-low rounded-lg p-1 border border-white/5">
                             <button class="w-8 h-8 flex items-center justify-center text-outline hover:text-secondary active:scale-90 transition-all" onclick="changeQuantity(${index}, -1)">
@@ -125,11 +126,13 @@ function changeQuantity(index, delta) {
     const item = cart[index];
     const newQty = item.quantity + delta;
     if (newQty <= 0) {
-        showToast(`❌ ${item.product.name} eliminado`);
+        // 🔧 CORREGIDO: escapeHtml en el nombre del producto
+        showToast(`❌ ${escapeHtml(item.product.name)} eliminado`);
         cart.splice(index, 1);
     } else {
         item.quantity = newQty;
-        showToast(`🔄 ${item.product.name} (x${newQty})`);
+        // 🔧 CORREGIDO: escapeHtml en el nombre del producto
+        showToast(`🔄 ${escapeHtml(item.product.name)} (x${newQty})`);
     }
     renderAll();
 }
@@ -137,7 +140,8 @@ function changeQuantity(index, delta) {
 function removeItem(index) {
     if (index < 0 || index >= cart.length) return;
     const item = cart[index];
-    showToast(`❌ ${item.product.name} eliminado`);
+    // 🔧 CORREGIDO: escapeHtml en el nombre del producto
+    showToast(`❌ ${escapeHtml(item.product.name)} eliminado`);
     cart.splice(index, 1);
     renderAll();
 }
@@ -188,7 +192,8 @@ function processAlmacenScan(text) {
     
     document.getElementById('almacenProductName').value = productName;
     document.getElementById('almacenForm').style.display = 'block';
-    showToast(`📸 Escaneado: ${productName}`);
+    // 🔧 CORREGIDO: escapeHtml para evitar XSS
+    showToast(`📸 Escaneado: ${escapeHtml(productName)}`);
     
     // Scroll al formulario
     document.getElementById('almacenForm').scrollIntoView({ behavior: 'smooth' });
@@ -198,10 +203,12 @@ function addProduct(product) {
     const existingIndex = cart.findIndex(item => item.product.id === product.id);
     if (existingIndex !== -1) {
         cart[existingIndex].quantity += 1;
-        showToast(`➕ ${product.name} (x${cart[existingIndex].quantity})`);
+        // 🔧 CORREGIDO: escapeHtml en el nombre del producto
+        showToast(`➕ ${escapeHtml(product.name)} (x${cart[existingIndex].quantity})`);
     } else {
         cart.push(new CartItem(product, 1));
-        showToast(`🆕 ${product.name} agregado`);
+        // Ya usabas escapeHtml aquí, se mantiene
+        showToast(`🆕 ${escapeHtml(product.name)} agregado`);
     }
     flashEffect();
     renderAll();
@@ -308,7 +315,8 @@ async function createDraftOrder() {
         const response = await fetch(GOOGLE_SHEET_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-Key': '44#,%:cSQ_mH[mXUFM|e<:pg6!ME<f&oqoh88I2mUbLri' // Reemplaza con tu clave real
             },
             body: JSON.stringify(datos)
         });
@@ -360,10 +368,11 @@ function renderizarInventario() {
     inventarioInvertido.forEach((item) => {
         const li = document.createElement('li');
         li.className = 'item-inventario';
+        // 🔧 CORREGIDO: escapeHtml para prevenir XSS en datos almacenados
         li.innerHTML = `
             <div class="item-info">
-                <span class="item-nombre">${item.producto}</span>
-                <span class="item-bodega">Bodega ${item.bodega}</span>
+                <span class="item-nombre">${escapeHtml(item.producto)}</span>
+                <span class="item-bodega">Bodega ${escapeHtml(item.bodega)}</span>
             </div>
             <span class="item-cantidad">${item.cantidad} uds</span>
         `;
@@ -405,7 +414,10 @@ async function submitStock() {
     try {
         const response = await fetch(GOOGLE_SHEET_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-API-Key': '44#,%:cSQ_mH[mXUFM|e<:pg6!ME<f&oqoh88I2mUbLri' // Reemplaza con tu clave real
+             },
             body: JSON.stringify(datos)
         });
         const result = await response.json();

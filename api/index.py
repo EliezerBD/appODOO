@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -7,9 +8,20 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 app = Flask(__name__)
-CORS(app)
 
-# Credenciales desde variable de entorno (obligatoria en Vercel)
+# ------------------------------------------------------------
+# CONFIGURACIÓN DE SEGURIDAD
+# ------------------------------------------------------------
+# Permite CORS únicamente desde el dominio de tu frontend
+DOMINIO_PERMITIDO = os.environ.get("DOMINIO_PERMITIDO", "https://app-odoo.vercel.app")
+CORS(app, origins=[DOMINIO_PERMITIDO])
+
+# Clave secreta para proteger el endpoint (debe coincidir con la del frontend)
+API_SECRET = os.environ.get("API_SECRET", "cambia-esta-clave-en-produccion")
+
+# ------------------------------------------------------------
+# AUTENTICACIÓN CON GOOGLE SHEETS
+# ------------------------------------------------------------
 try:
     creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS_JSON"])
     scopes = ["https://www.googleapis.com/auth/spreadsheets"]
@@ -20,24 +32,39 @@ except Exception as e:
     cliente_gs = None
 
 HOJA_ID = os.environ.get("GOOGLE_SHEET_ID", "1vb42AMPeRonYe9oSQ_C_nOTjWuGBER7zvXg5KXjE1QE")
-DOMINIO_PERMITIDO = os.environ.get("DOMINIO_PERMITIDO", "https://app-odoo.vercel.app")
 
+# ------------------------------------------------------------
+# FUNCIÓN PARA EVITAR INYECCIÓN DE FÓRMULAS EN SHEETS
+# ------------------------------------------------------------
+def sanitizar_para_sheets(valor):
+    """
+    Convierte cualquier valor a string y lo escapa
+    si comienza con =, +, - o @ (evita que Google Sheets
+    interprete el contenido como una fórmula maliciosa).
+    """
+    str_val = str(valor)
+    if str_val and str_val[0] in ('=', '+', '-', '@'):
+        # Una comilla simple al principio fuerza a Sheets a tratarlo como texto
+        return "'" + str_val
+    return str_val
+
+# ------------------------------------------------------------
+# ENDPOINT PRINCIPAL
+# ------------------------------------------------------------
 @app.route("/api/submit", methods=["POST", "OPTIONS"])
 def guardar_pedido():
-    # Responder a preflight CORS
+    # Respuesta automática a la petición preflight CORS
     if request.method == "OPTIONS":
         response = jsonify({"status": "ok"})
-        response.headers["Access-Control-Allow-Origin"] = DOMINIO_PERMITIDO
-        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        # Los headers CORS los agrega automáticamente flask_cors
         return response
 
-    # Verificar el origen de la petición
-    origen = request.headers.get("Origin")
-    # En desarrollo local el origen a veces es None, por seguridad en producción exigimos que coincida
-    if origen and origen != DOMINIO_PERMITIDO:
-        return jsonify({"success": False, "error": "Acceso no permitido desde este origen"}), 403
+    # 1. Verificar API Key
+    api_key = request.headers.get("X-API-Key")
+    if not api_key or api_key != API_SECRET:
+        return jsonify({"success": False, "error": "Acceso no autorizado. Falta API key válida."}), 401
 
+    # 2. Verificar que Google Sheets esté disponible
     if cliente_gs is None:
         return jsonify({"success": False, "error": "Backend no autenticado con Google Sheets. Revisa credenciales."}), 500
 
@@ -45,37 +72,43 @@ def guardar_pedido():
         datos = request.get_json()
         tipo = datos.get("tipo", "")
         libro = cliente_gs.open_by_key(HOJA_ID)
-        
+
+        # ---------------------------
+        # CASO: ENTRADA DE ALMACÉN
+        # ---------------------------
         if tipo == "ALMACEN":
             bodega_num = datos.get("bodega", "")
             nombre_hoja = f"BODEGA{bodega_num}"
-            
+
             try:
                 hoja = libro.worksheet(nombre_hoja)
             except gspread.exceptions.WorksheetNotFound:
-                # Si no existe, la crea
                 hoja = libro.add_worksheet(title=nombre_hoja, rows="1000", cols="5")
                 hoja.append_row(["Fecha", "Producto", "Cantidad"])
-                
+
             fila = [
-                datos.get("fecha", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                datos.get("producto", ""),
-                datos.get("cantidad", 0)
+                sanitizar_para_sheets(datos.get("fecha", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))),
+                sanitizar_para_sheets(datos.get("producto", "")),
+                sanitizar_para_sheets(datos.get("cantidad", 0))
             ]
             hoja.append_row(fila)
             return jsonify({"success": True})
-            
+
+        # ---------------------------
+        # CASO: PEDIDO DE CLIENTE
+        # ---------------------------
         else:
             cliente_datos = datos.get("cliente", {})
             carrito = datos.get("carrito", [])
 
-            # Obtener la hoja exacta (mayúsculas/minúsculas exactas)
             try:
-                hoja = libro.worksheet("SALIDA") # Intentar obtener la hoja "SALIDA"
+                hoja = libro.worksheet("SALIDA")
             except gspread.exceptions.WorksheetNotFound:
-                # Si no existe, la crea con el nombre "SALIDA"
                 hoja = libro.add_worksheet(title="SALIDA", rows="1000", cols="20")
-                hoja.append_row(["Fecha", "Nombre", "Apellido", "Email", "DUI", "Teléfono", "Producto", "Precio", "Cantidad", "Subtotal"])
+                hoja.append_row([
+                    "Fecha", "Nombre", "Apellido", "Email", "DUI", "Teléfono",
+                    "Producto", "Precio", "Cantidad", "Subtotal"
+                ])
 
             fecha = datetime.now().strftime("%Y-%m-%d")
 
@@ -85,22 +118,28 @@ def guardar_pedido():
                 subtotal_val = precio_val * cantidad_val
 
                 fila = [
-                    fecha,
-                    cliente_datos.get("firstname", ""),
-                    cliente_datos.get("lastname", ""),
-                    cliente_datos.get("email", ""),
-                    cliente_datos.get("dui", ""),
-                    cliente_datos.get("telefono", ""),
-                    item.get("nombre", ""),
-                    precio_val,
-                    cantidad_val,
-                    subtotal_val
+                    sanitizar_para_sheets(fecha),
+                    sanitizar_para_sheets(cliente_datos.get("firstname", "")),
+                    sanitizar_para_sheets(cliente_datos.get("lastname", "")),
+                    sanitizar_para_sheets(cliente_datos.get("email", "")),
+                    sanitizar_para_sheets(cliente_datos.get("dui", "")),
+                    sanitizar_para_sheets(cliente_datos.get("telefono", "")),
+                    sanitizar_para_sheets(item.get("nombre", "")),
+                    sanitizar_para_sheets(precio_val),
+                    sanitizar_para_sheets(cantidad_val),
+                    sanitizar_para_sheets(subtotal_val)
                 ]
                 hoja.append_row(fila)
 
             return jsonify({"success": True})
+
     except Exception as e:
-        # Capturar cualquier error y mostrarlo
         mensaje = str(e)
         print("ERROR en guardar_pedido:", mensaje)
         return jsonify({"success": False, "error": mensaje}), 500
+
+# ------------------------------------------------------------
+# PARA PRUEBAS LOCALES (opcional)
+# ------------------------------------------------------------
+if __name__ == "__main__":
+    app.run(debug=True)
