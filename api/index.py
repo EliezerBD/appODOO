@@ -52,7 +52,7 @@ def get_apikey():
         "https://app-odoo-git-main-eliezerbd.vercel.app"  # ajusta según tu preview real
     ]
     # También acepta si no hay Origin (ej. peticiones directas del backend)
-    if origen and origen not in dominios_permitidos:
+    if not origen or origen not in dominios_permitidos:
         return jsonify({"error": "No autorizado"}), 403
     return jsonify({"apiKey": API_SECRET})
 # ------------------------------------------------------------
