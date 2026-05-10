@@ -207,14 +207,14 @@ body {
     display: block;
     width: 100%;
     border: none;
-    border-bottom: 1px solid #515151;
+    border-bottom: 1px solid #070707;
     background: #3d3e42;
     color: #ffffff;
     border-radius: 4px 4px 0 0;
 }
 
 input {
-    background-color: #8c909f !important;
+    background-color: #101011 !important;
     color: #ffffff !important;
 }
 
