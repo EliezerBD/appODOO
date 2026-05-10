@@ -1,0 +1,220 @@
+<style><span data-mce-type="bookmark" style="display: inline-block; width: 0px; overflow: hidden; line-height: 0;" class="mce_SELRES_start">﻿</span><br />
+.seccion-grid {<br />
+  display: grid;<br />
+  grid-template-columns: 1fr 1fr;<br />
+  gap: 2rem;<br />
+  align-items: center;<br />
+  max-width: 1200px;<br />
+  margin: 2rem auto;<br />
+  padding: 0 1rem;<br />
+}</p>
+<p>.titulo-portfolio {<br />
+  color: #f2ca50;<br />
+  font-size: 1.2rem;<br />
+  font-weight: 600;<br />
+  letter-spacing: 2px;<br />
+  margin-bottom: 0.5rem;<br />
+  text-transform: uppercase;<br />
+}</p>
+<p>.soluciones {<br />
+  font-size: 2.5rem;<br />
+  font-weight: 800;<br />
+  line-height: 1.2;<br />
+  margin-bottom: 0;<br />
+}</p>
+<p>.descripcion {<br />
+  font-size: 1.125rem;<br />
+  color: rgb(74, 74, 74);<br />
+  line-height: 1.5;<br />
+}</p>
+<p>/* Responsive: en móviles se apila */<br />
+@media (max-width: 768px) {<br />
+  .seccion-grid {<br />
+    grid-template-columns: 1fr;<br />
+    gap: 1.5rem;<br />
+    text-align: center;<br />
+  }<br />
+  .titulo-portfolio {<br />
+    text-align: center;<br />
+  }<br />
+}<br />
+</style>
+<div class="seccion-grid"><!-- LADO IZQUIERDO -->
+<div>
+<div class="titulo-portfolio">Portfolio de Productos</div>
+<div class="soluciones">SOLUCIONES DE LUBRICACIÓN</div>
+</div>
+<!-- LADO DERECHO -->
+<div class="descripcion">Rendimiento certificado para motores de gasolina, diesel y sistemas hidráulicos industriales.</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+parte de los numeros
+<div class="mi-slider-wrapper"><style>
+    /* ESTILOS ENCAPSULADOS - No afectan al resto de la página */<br />
+    .mi-slider-wrapper .container {<br />
+      display: flex;<br />
+      flex-direction: column;<br />
+      gap: 2rem;<br />
+      align-items: center;<br />
+      justify-content: center;<br />
+      padding: 2rem;<br />
+      background: #ffc107;<br />
+      border-radius: 1rem;<br />
+      font-style: italic;<br />
+      font-weight: bold;<br />
+    }</p>
+<p>    .mi-slider-wrapper .number {<br />
+      display: flex;<br />
+      align-items: center;<br />
+      font-size: 4rem;<br />
+      justify-content: flex-end;<br />
+      font-family: monospace;<br />
+    }</p>
+<p>    .mi-slider-wrapper .number .animate {<br />
+      filter: url("#blurFilter");<br />
+    }</p>
+<p>    .mi-slider-wrapper .number .left,<br />
+    .mi-slider-wrapper .number .right {<br />
+      min-width: 8rem;<br />
+      text-align: right;<br />
+    }</p>
+<p>    .mi-slider-wrapper .number .right {<br />
+      padding-right: 1rem;<br />
+    }</p>
+<p>    .mi-slider-wrapper .number .separator {<br />
+      opacity: 0;<br />
+      transition: opacity 0.1s ease;<br />
+      font-size: 4rem;<br />
+    }</p>
+<p>    .mi-slider-wrapper .number .separator.show {<br />
+      opacity: 1;<br />
+    }</p>
+<p>    .mi-slider-wrapper .slider {<br />
+      accent-color: black;<br />
+      min-width: min(20rem, 60vw);<br />
+      width: 100%;<br />
+    }</p>
+<p>    /* SVG filter oculto pero funcional */<br />
+    .mi-slider-wrapper .svgFilter {<br />
+      display: block;<br />
+      width: 0;<br />
+      height: 0;<br />
+      position: absolute;<br />
+      pointer-events: none;<br />
+    }</p>
+<p>    /* Ajustes responsivos */<br />
+    @media (max-width: 640px) {<br />
+      .mi-slider-wrapper .number {<br />
+        font-size: 2.5rem;<br />
+      }<br />
+      .mi-slider-wrapper .number .left,<br />
+      .mi-slider-wrapper .number .right {<br />
+        min-width: 4rem;<br />
+      }<br />
+    }<br />
+  </style>
+<div class="container"><input id="slider" class="slider" list="values" max="20000" min="0" step="5000" type="range" value="20000" />&nbsp;
+<div id="number" class="number">
+<div id="left" class="left"></div>
+<div id="separator" class="separator">,</div>
+<div id="right" class="right">0</div>
+</div>
+</div>
+&nbsp;
+
+</div>
+<script>
+  (function() {
+    // Buscar los elementos dentro del contenedor para evitar conflictos
+    const container = document.querySelector('.mi-slider-wrapper');
+    if (!container) return;
+
+    const number = container.querySelector("#number");
+    const left = container.querySelector("#left");
+    const right = container.querySelector("#right");
+    const slider = container.querySelector("#slider");
+    const separator = container.querySelector("#separator");
+
+    let target = 20000;
+    let current = 0;
+    const step = 42;
+
+    const updateValues = () => {
+      const [first, ...rest] = current.toLocaleString("en-US").split(",").reverse();
+      let thousends = rest.reverse();
+      const thousendsString = thousends.join("");
+      
+      if (+left.innerText != thousendsString) {
+        left.classList.add("animate");
+      } else {
+        left.classList.remove("animate");
+      }
+      left.innerText = thousendsString;
+      right.innerText = first;
+    };
+
+    const update = () => {
+      if (target - current > 0) {
+        current += step;
+      } else {
+        current -= step;
+      }
+      
+      if (current >= 1000) {
+        separator.classList.add("show");
+      } else {
+        separator.classList.remove("show");
+      }
+      
+      updateValues();
+      
+      if (Math.abs(target - current) > step) {
+        requestAnimationFrame(update);
+      } else {
+        requestAnimationFrame(() => {
+          current = target;
+          updateValues();
+          left.classList.remove("animate");
+          right.classList.remove("animate");
+        });
+      }
+    };
+
+    const start = () => {
+      right.classList.add("animate");
+      update();
+    };
+
+    slider.addEventListener("input", (event) => {
+      target = +event.target.value;
+      start();
+    });
+
+    // Iniciar animación
+    start();
+  })();
+</script>

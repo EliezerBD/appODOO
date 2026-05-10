@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lubricantes Premium</title>
+  <style>
+    :root {
+      --yellow: #f2c400;
+      --text-main: #1f2933;
+      --text-soft: #6b7280;
+      --border-soft: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #ffffff;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .page {
+      padding: 4rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3, h4 {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    h1 { font-size: 2.75rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 2rem; }
+    h4 { font-size: 1.25rem; }
+
+    p { color: var(--text-soft); }
+
+    /* HERO */
+    .hero {
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .hero-line {
+      width: 90px;
+      height: 4px;
+      background-color: var(--yellow);
+      border-radius: 2px;
+    }
+
+    /* MARCAS */
+    .brands {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+    }
+
+    .brand-card {
+      border: 1px solid var(--border-soft);
+      padding: 2.5rem;
+      border-radius: 16px;
+      background-color: #fff;
+    }
+
+    /* PRODUCTOS */
+    .products {
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+    }
+
+    ul {
+      margin-top: 1rem;
+      padding-left: 1.1rem;
+      color: var(--text-soft);
+    }
+
+    li { margin-bottom: 0.4rem; }
+
+    /* BENEFICIOS */
+    .benefits {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .benefit-box {
+      background-color: rgba(242,196,0,0.08);
+      border-radius: 24px;
+      min-height: 220px;
+    }
+
+    /* CONTACTO */
+    .contact {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .contact span {
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2.2rem; }
+      h3 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="page">
+
+    <!-- HERO -->
+    <section class="hero">
+      <h1>Lubricantes y soluciones automotrices de alto desempeño</h1>
+      <p>Tecnología avanzada para proteger, optimizar y extender la vida útil de motores y equipos industriales.</p>
+      <div class="hero-line"></div>
+    </section>
+
+    <!-- MARCAS -->
+    <section class="brands">
+      <div class="brand-card">
+        <h2>SUPERKOTE 2000</h2>
+        <p>Tratamientos avanzados y lubricantes diseñados para máxima protección del metal y reducción extrema de fricción.</p>
+      </div>
+      <div class="brand-card">
+        <h2>UBERLUB EXCELL</h2>
+        <p>Aceites, grasas y fluidos premium para aplicaciones automotrices e industriales de alta exigencia.</p>
+      </div>
+    </section>
+
+    <!-- PRODUCTOS -->
+    <section class="products">
+      <h3>Catálogo de productos</h3>
+      <div class="product-grid">
+
+        <div>
+          <h4>Aceites para motor</h4>
+          <p>Minerales, semisintéticos y sintéticos para motores modernos y alto kilometraje.</p>
+          <ul>
+            <li>Protección térmica</li>
+            <li>Arranque suave</li>
+            <li>Mayor limpieza interna</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Tratamientos para metal y combustible</h4>
+          <p>Aditivos tecnológicos que reducen fricción y mejoran el rendimiento.</p>
+          <ul>
+            <li>Ahorro de combustible</li>
+            <li>Protección prolongada</li>
+            <li>Menor desgaste</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Grasas industriales y automotrices</h4>
+          <p>Lubricación confiable para cargas pesadas y condiciones extremas.</p>
+          <ul>
+            <li>Alta adherencia</li>
+            <li>Resistencia al agua</li>
+            <li>Larga duración</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Líquidos hidráulicos, frenos y refrigerantes</h4>
+          <p>Fluidos especializados para seguridad, control térmico y estabilidad.</p>
+          <ul>
+            <li>Estabilidad térmica</li>
+            <li>Protección anticorrosión</li>
+            <li>Funcionamiento confiable</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- BENEFICIOS -->
+    <section class="benefits">
+      <div>
+        <h3>Beneficios clave</h3>
+        <ul>
+          <li>Protección avanzada del motor</li>
+          <li>Reducción de fricción y desgaste</li>
+          <li>Ahorro de combustible</li>
+          <li>Mayor vida útil del equipo</li>
+          <li>Uso automotriz e industrial</li>
+        </ul>
+      </div>
+      <div class="benefit-box"></div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section class="contact">
+      <h3>Contacto</h3>
+      <p>Solicita información de nuestros productos y recibe asesoría profesional.</p>
+      <p><span>Teléfono:</span> +503 0000 0000</p>
+      <p><span>Correo:</span> info@lubricantespremium.com</p>
+    </section>
+
+  </main>
+
+</body>
+</html>

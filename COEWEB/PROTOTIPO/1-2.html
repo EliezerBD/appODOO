@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Superkote 2000 & Uberlub Excell</title>
+
+  <style>
+    :root{
+      --bg:#f8f9fa;
+      --white:#ffffff;
+      --text:#1f2933;
+      --muted:#6b7280;
+      --accent:#0f766e;
+      --line:#e5e7eb;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.6;
+    }
+
+    a{
+      text-decoration:none;
+      color:inherit;
+    }
+
+    .container{
+      max-width:1200px;
+      margin:auto;
+      padding:64px 24px;
+    }
+
+    /* HEADER */
+    header{
+      background:var(--white);
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      max-width:1200px;
+      margin:auto;
+      padding:20px 24px;
+    }
+
+    .nav ul{
+      display:flex;
+      list-style:none;
+      gap:24px;
+    }
+
+    /* HERO */
+    .hero{
+      background:var(--white);
+      border-bottom:1px solid var(--line);
+    }
+
+    .hero h1{
+      font-size:44px;
+      max-width:720px;
+    }
+
+    .hero p{
+      margin-top:20px;
+      font-size:18px;
+      color:var(--muted);
+      max-width:640px;
+    }
+
+    .btn{
+      display:inline-block;
+      margin-top:32px;
+      padding:14px 28px;
+      border:1px solid var(--text);
+      border-radius:6px;
+      transition:0.2s;
+    }
+
+    .btn:hover{
+      background:var(--text);
+      color:white;
+    }
+
+    /* SECTIONS */
+    section{
+      background:var(--white);
+      border-bottom:1px solid var(--line);
+    }
+
+    section.alt{
+      background:var(--bg);
+    }
+
+    h2{
+      font-size:28px;
+      margin-bottom:10px;
+    }
+
+    .lead{
+      color:var(--muted);
+      margin-bottom:40px;
+      max-width:700px;
+    }
+
+    /* GRID / CARDS */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:24px;
+    }
+
+    .card{
+      background:var(--white);
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:28px;
+    }
+
+    .card strong{
+      font-size:16px;
+    }
+
+    .card span{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    /* CONTACT */
+    .contact{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:40px;
+    }
+
+    input, textarea{
+      width:100%;
+      padding:12px;
+      margin-bottom:12px;
+      border:1px solid var(--line);
+      border-radius:5px;
+      font-family:inherit;
+    }
+
+    footer{
+      text-align:center;
+      padding:40px 20px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    @media(max-width:768px){
+      .hero h1{
+        font-size:34px;
+      }
+      .contact{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <strong>Superkote 2000 · Uberlub Excell</strong>
+    <ul>
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#productos">Productos</a></li>
+      <li><a href="#aplicaciones">Aplicaciones</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="inicio" class="hero">
+  <div class="container">
+    <h1>Protección y rendimiento que se siente en cada kilómetro</h1>
+    <p>
+      Lubricantes y tratamientos diseñados para prolongar la vida útil de motores
+      y equipos en condiciones exigentes.
+    </p>
+    <a href="#productos" class="btn">Ver productos</a>
+  </div>
+</section>
+
+<!-- MARCAS -->
+<section>
+  <div class="container grid">
+    <div class="card">
+      <strong>SUPERKOTE 2000</strong>
+      <p>Tratamientos para metal y combustible que reducen fricción, desgaste y consumo.</p>
+    </div>
+
+    <div class="card">
+      <strong>UBERLUB EXCELL</strong>
+      <p>Aceites minerales, semisintéticos y sintéticos para uso liviano e industrial.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTOS -->
+<section id="productos" class="alt">
+  <div class="container">
+    <h2>Productos destacados</h2>
+    <p class="lead">Soluciones confiables para mantenimiento preventivo y alto rendimiento.</p>
+
+    <div class="grid">
+      <div class="card">
+        <strong>Superkote 2000 – Tratamiento para Metal</strong><br>
+        <span>Reduce fricción y desgaste</span>
+      </div>
+
+      <div class="card">
+        <strong>Superkote 2000 – Tratamiento para Combustible</strong><br>
+        <span>Ahorro y limpieza del sistema</span>
+      </div>
+
+      <div class="card">
+        <strong>Excell Extreme 15W‑40</strong><br>
+        <span>Aceite mineral de alto desempeño</span>
+      </div>
+
+      <div class="card">
+        <strong>Excell Full Sintético 5W‑30</strong><br>
+        <span>Protección avanzada del motor</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APLICACIONES -->
+<section id="aplicaciones">
+  <div class="container">
+    <h2>Aplicaciones</h2>
+    <p class="lead">Diseñado para múltiples entornos de trabajo.</p>
+
+    <div class="grid">
+      <div class="card">Vehículos livianos</div>
+      <div class="card">Transporte pesado</div>
+      <div class="card">Maquinaria industrial</div>
+      <div class="card">Agricultura y construcción</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto" class="alt">
+  <div class="container contact">
+    <div>
+      <h2>Contacto</h2>
+      <p class="lead">Distribuidor autorizado – El Salvador</p>
+      <p>
+        Tel: 2220‑7288<br>
+        Cel: 7859‑3326<br>
+        Col. Escalón, San Salvador
+      </p>
+    </div>
+
+    <form>
+      <input type="text" placeholder="Nombre">
+      <input type="tel" placeholder="Teléfono">
+      <textarea rows="4" placeholder="Mensaje"></textarea>
+      <button class="btn" type="submit">Enviar</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  © Superkote 2000 · Uberlub Excell · Demo web
+</footer>
+
+</body>
+</html>

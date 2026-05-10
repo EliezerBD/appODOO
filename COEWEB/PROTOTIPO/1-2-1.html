@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Superkote 2000 & Uberlub Excell</title>
+
+<style>
+:root{
+  --bg:#f4f6f7;
+  --white:#ffffff;
+  --dark:#1c1f23;
+  --muted:#6f7780;
+  --accent:#0b5e5a;
+  --accent-soft:#e6f2f1;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background:var(--bg);
+  color:var(--dark);
+  line-height:1.7;
+}
+
+/* GLOBAL */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:80px 24px;
+}
+
+a{text-decoration:none;color:inherit}
+
+/* HEADER */
+header{
+  background:var(--white);
+  position:fixed;
+  width:100%;
+  top:0;
+  z-index:10;
+  box-shadow:0 2px 12px rgba(0,0,0,0.04);
+}
+
+.nav{
+  max-width:1200px;
+  margin:auto;
+  padding:20px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.nav ul{
+  display:flex;
+  gap:28px;
+  list-style:none;
+}
+
+.nav ul li{
+  font-size:14px;
+  color:var(--muted);
+}
+
+/* HERO */
+.hero{
+  background:
+    linear-gradient(120deg,var(--accent),#083e3b);
+  color:white;
+  padding-top:160px;
+}
+
+.hero h1{
+  font-size:48px;
+  max-width:760px;
+  line-height:1.1;
+}
+
+.hero p{
+  margin-top:24px;
+  font-size:18px;
+  opacity:0.9;
+  max-width:620px;
+}
+
+.btn{
+  display:inline-block;
+  margin-top:40px;
+  padding:16px 34px;
+  border-radius:30px;
+  background:white;
+  color:var(--accent);
+  font-weight:500;
+}
+
+/* SECTIONS */
+section{background:var(--white)}
+
+section.alt{background:var(--bg)}
+
+h2{
+  font-size:32px;
+  margin-bottom:12px;
+}
+
+.lead{
+  color:var(--muted);
+  max-width:680px;
+  margin-bottom:56px;
+}
+
+/* CARDS */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:32px;
+}
+
+.card{
+  background:var(--white);
+  border-radius:16px;
+  padding:32px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 40px rgba(0,0,0,0.08);
+}
+
+.card strong{font-size:18px}
+
+.card span{
+  display:block;
+  margin-top:10px;
+  color:var(--muted);
+}
+
+/* COLOR BLOCK */
+.highlight{
+  background:var(--accent-soft);
+  border-left:6px solid var(--accent);
+  padding:32px;
+  border-radius:12px;
+}
+
+/* CONTACT */
+.contact{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:48px;
+}
+
+input,textarea{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:8px;
+  margin-bottom:14px;
+}
+
+footer{
+  background:var(--dark);
+  color:#b8c0c7;
+  text-align:center;
+  padding:48px 24px;
+  font-size:14px;
+}
+
+@media(max-width:768px){
+  .hero h1{font-size:36px}
+  .contact{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <strong>Superkote 2000 · Uberlub Excell</strong>
+    <ul>
+      <li>Inicio</li>
+      <li>Productos</li>
+      <li>Aplicaciones</li>
+      <li>Contacto</li>
+    </ul>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Ingeniería que protege motores, reduce desgaste y maximiza rendimiento</h1>
+    <p>
+      Tratamientos y lubricantes creados para quienes exigen más durabilidad,
+      eficiencia y control en condiciones reales de trabajo.
+    </p>
+    <a class="btn">Explorar soluciones</a>
+  </div>
+</section>
+
+<section>
+  <div class="container grid">
+    <div class="highlight">
+      <strong>SUPERKOTE 2000</strong>
+      <span>Tratamientos antifricción para metal y combustible que transforman el desempeño del motor.</span>
+    </div>
+    <div class="highlight">
+      <strong>UBERLUB EXCELL</strong>
+      <span>Aceites y fluidos industriales diseñados para protección continua y larga vida útil.</span>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Productos clave</h2>
+    <p class="lead">Soluciones seleccionadas para mantenimiento inteligente y alto rendimiento.</p>
+
+    <div class="grid">
+      <div class="card">
+        <strong>Tratamiento para Metal</strong>
+        <span>Reduce fricción, temperatura y desgaste interno.</span>
+      </div>
+
+      <div class="card">
+        <strong>Tratamiento para Combustible</strong>
+        <span>Mejor combustión, ahorro y limpieza.</span>
+      </div>
+
+      <div class="card">
+        <strong>Excell Extreme 15W‑40</strong>
+        <span>Protección constante para trabajo pesado.</span>
+      </div>
+
+      <div class="card">
+        <strong>Excell Full Sintético 5W‑30</strong>
+        <span>Máxima limpieza y durabilidad del motor.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Aplicaciones reales</h2>
+    <p class="lead">Diseñado para entornos exigentes y uso profesional.</p>
+
+    <div class="grid">
+      <div class="card">Vehículos livianos</div>
+      <div class="card">Transporte pesado</div>
+      <div class="card">Industria y maquinaria</div>
+      <div class="card">Agricultura y construcción</div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container contact">
+    <div>
+      <h2>Contacto</h2>
+      <p class="lead">Distribuidor autorizado en El Salvador</p>
+      <p>
+        Tel: 2220‑7288<br>
+        Cel: 7859‑3326<br>
+        Col. Escalón, San Salvador
+      </p>
+    </div>
+
+    <form>
+      <input placeholder="Nombre">
+      <input placeholder="Teléfono">
+      <textarea rows="4" placeholder="Mensaje"></textarea>
+      <button class="btn" type="submit">Enviar mensaje</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  © Superkote 2000 · Uberlub Excell — Demo conceptual
+</footer>
+
+</body>
+</html>
