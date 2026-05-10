@@ -19,7 +19,7 @@ class CartItem {
 
 // ==================== ESTADO ====================
 let cart = [];
-let clientFirstname = '', clientLastname = '', clientEmail = '', clientDUI = '', clientPhone = '';
+let clientFirstName = '', clientLastName = '', clientEmail = '', clientDUI = '', clientPhone = '';
 let lastScanTime = 0;
 let html5QrCode = null;
 
@@ -48,43 +48,59 @@ function renderCart() {
     const container = document.getElementById('cartContainer');
     const countSpan = document.getElementById('cartCount');
     const totalRow = document.getElementById('cartTotalRow');
+    const subtotalDisplay = document.getElementById('subtotalDisplay');
+    const taxDisplay = document.getElementById('taxDisplay');
     const totalDisplay = document.getElementById('totalPriceDisplay');
 
     if (cart.length === 0) {
-        container.innerHTML = '<div class="empty-cart">No hay productos aún. Escanea un código para empezar.</div>';
-        countSpan.textContent = '(0)';
+        container.innerHTML = '<div class="empty-cart text-center text-on-surface-variant p-lg" id="emptyCartMsg">No products yet. Scan a barcode to begin.</div>';
+        countSpan.textContent = '(0) ITEMS';
         totalRow.style.display = 'none';
         return;
     }
-    countSpan.textContent = `(${cart.length})`;
-    totalRow.style.display = 'flex';
+    
+    const itemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    countSpan.textContent = `(${itemsCount}) ITEM${itemsCount !== 1 ? 'S' : ''}`;
+    totalRow.style.display = 'block';
 
     let html = '';
     cart.forEach((item, index) => {
         html += `
-            <div class="cart-item">
-                <div class="item-info">
-                    <div class="item-name">${escapeHtml(item.product.name)}</div>
-                    <div class="item-price">
-                        $<input type="number" step="0.01" min="0" 
-                               class="price-input" 
-                               value="${item.product.price.toFixed(2)}"
-                               oninput="updatePrice(${index}, this.value)">
-                        c/u
+            <div class="glass-card light-catch rounded-[24px] p-md flex gap-md items-center">
+                <div class="w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-blue-900/50 to-cyan-900/50 shrink-0 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[28px] text-secondary/50">inventory_2</span>
+                </div>
+                <div class="flex-grow min-w-0">
+                    <h3 class="font-title-sm text-title-sm text-on-surface leading-tight mb-xs">${escapeHtml(item.product.name)}</h3>
+                    <p class="font-body-sm text-body-sm text-secondary">
+                        $<input type="number" step="0.01" min="0" class="w-24 bg-transparent text-secondary border-b border-secondary/30 outline-none" value="${item.product.price.toFixed(2)}" onchange="updatePrice(${index}, this.value)"> c/u
+                    </p>
+                    <div class="flex items-center mt-sm">
+                        <div class="flex items-center bg-surface-container-low rounded-lg p-1 border border-white/5">
+                            <button class="w-8 h-8 flex items-center justify-center text-outline hover:text-secondary active:scale-90 transition-all" onclick="changeQuantity(${index}, -1)">
+                                <span class="material-symbols-outlined text-[18px]">remove</span>
+                            </button>
+                            <span class="px-md font-label-caps text-label-caps text-on-surface quantity-display">${item.quantity}</span>
+                            <button class="w-8 h-8 flex items-center justify-center text-outline hover:text-secondary active:scale-90 transition-all" onclick="changeQuantity(${index}, 1)">
+                                <span class="material-symbols-outlined text-[18px]">add</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="quantity-controls">
-                    <button class="qty-btn" onclick="changeQuantity(${index}, -1)">−</button>
-                    <span style="min-width:20px; text-align:center;">${item.quantity}</span>
-                    <button class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
-                </div>
-                <button class="remove-btn" onclick="removeItem(${index})">🗑️</button>
+                <button class="self-start text-outline hover:text-error transition-colors p-xs active:scale-90" onclick="removeItem(${index})">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
             </div>
         `;
     });
     container.innerHTML = html;
 
-    const total = cart.reduce((sum, item) => sum + item.subtotal, 0);
+    const subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
+    const tax = subtotal * 0.08;
+    const total = subtotal + tax;
+
+    subtotalDisplay.textContent = `$${subtotal.toFixed(2)}`;
+    taxDisplay.textContent = `$${tax.toFixed(2)}`;
     totalDisplay.textContent = `$${total.toFixed(2)}`;
 }
 
@@ -97,10 +113,9 @@ function escapeHtml(text) {
 function updateCreateButton() {
     const btn = document.getElementById('btnCreateOrder');
     const clientValid = 
-        clientFirstname.trim() !== '' &&
-        clientLastname.trim()  !== '' &&
-        clientDUI.trim()       !== '' &&
-        clientPhone.trim()     !== '';
+        clientFirstName.trim() !== '' &&
+        clientLastName.trim() !== '' &&
+        clientEmail.trim()    !== '';
     btn.disabled = !(cart.length > 0 && clientValid);
 }
 
@@ -169,6 +184,7 @@ function addProduct(product) {
 // ==================== CÁMARA REAL ====================
 function startCamera() {
     if (html5QrCode) stopCamera();
+    document.getElementById('qrReader').style.display = 'block';
     document.getElementById('qrReader').classList.add('active');
     document.getElementById('cameraPlaceholder').style.display = 'none';
     document.getElementById('btnActivateCamera').disabled = true;
@@ -185,6 +201,7 @@ function startCamera() {
                     html5QrCode = null;
                     document.getElementById('btnActivateCamera').disabled = false;
                     document.getElementById('btnStopCamera').disabled = true;
+                    document.getElementById('qrReader').style.display = 'none';
                     document.getElementById('qrReader').classList.remove('active');
                     document.getElementById('cameraPlaceholder').style.display = 'flex';
                 });
@@ -201,6 +218,7 @@ function stopCamera() {
     if (html5QrCode) {
         html5QrCode.stop().then(() => html5QrCode = null).catch(() => { });
     }
+    document.getElementById('qrReader').style.display = 'none';
     document.getElementById('qrReader').classList.remove('active');
     document.getElementById('cameraPlaceholder').style.display = 'flex';
     document.getElementById('btnActivateCamera').disabled = false;
@@ -215,22 +233,20 @@ function switchTab(tabId) {
 
 // ==================== ENVIAR PEDIDO (BACKEND VERCEL) ====================
 async function createDraftOrder() {
-    if (cart.length === 0 || 
-        !clientFirstname.trim() || !clientLastname.trim() ||
-        !clientDUI.trim()      || !clientPhone.trim()) {
-        showToast('Completa los campos obligatorios y añade productos');
+    if (cart.length === 0 || !clientFirstName.trim() || !clientLastName.trim() || !clientEmail.trim()) {
+        showToast('Completa los campos obligatorios (Nombre, Apellido y Email) y añade productos');
         return;
     }
 
     const btn = document.getElementById('btnCreateOrder');
-    const originalText = btn.textContent;
-    btn.textContent = '⏳ Enviando...';
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span>Enviando...</span><span class="material-symbols-outlined animate-spin">sync</span>';
     btn.disabled = true;
 
     const datos = {
         cliente: {
-            firstname: clientFirstname.trim(),
-            lastname:  clientLastname.trim(),
+            firstname: clientFirstName.trim(),
+            lastname:  clientLastName.trim(),
             email:     clientEmail.trim(),
             dui:       clientDUI.trim(),
             telefono:  clientPhone.trim()
@@ -257,16 +273,16 @@ async function createDraftOrder() {
             showToast('✅ Pedido guardado en Google Sheets');
             // Limpiar todo
             cart = [];
-            document.getElementById('clientFirstname').value = '';
-            document.getElementById('clientLastname').value = '';
-            document.getElementById('clientEmail').value = '';
-            document.getElementById('clientDUI').value = '';
-            document.getElementById('clientPhone').value = '';
-            clientFirstname = ''; clientLastname = '';
-            clientEmail = ''; clientDUI = ''; clientPhone = '';
+            document.getElementById('first_name').value = '';
+            document.getElementById('last_name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('dui').value = '';
+            document.getElementById('phone').value = '';
+            clientFirstName = ''; clientLastName = ''; clientEmail = ''; clientDUI = ''; clientPhone = '';
             renderAll();
-            document.querySelector('input[value="camara"]').checked = true;
-            switchTab('camara');
+            // Switch to camera tab
+            const btnCamera = document.querySelector('[data-tab="cameraTab"]');
+            if(btnCamera && typeof switchTab === 'function') switchTab('cameraTab', btnCamera);
         } else {
             showToast('❌ Error del servidor: ' + (result.error || 'desconocido'));
         }
@@ -274,32 +290,59 @@ async function createDraftOrder() {
         console.error(error);
         showToast('⚠️ Sin respuesta del servidor. Verifica tu conexión, pero los datos podrían haberse guardado. Revisa la hoja.');
     } finally {
-        btn.textContent = originalText;
+        btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
+window.saveCustomer = function() {
+    if (!clientFirstName.trim() || !clientLastName.trim() || !clientEmail.trim()) {
+        showToast('Completa Nombre, Apellido y Email');
+        return;
+    }
+    showToast('Cliente guardado, procede a escanear');
+    const btnCamera = document.querySelector('[data-tab="cameraTab"]');
+    if(btnCamera) btnCamera.click();
+}
+
 // ==================== INICIALIZACIÓN ====================
 window.addEventListener('load', () => {
-    document.getElementById('clientFirstname').addEventListener('input', e => {
-        clientFirstname = e.target.value;
-        updateCreateButton();
-    });
-    document.getElementById('clientLastname').addEventListener('input', e => {
-        clientLastname = e.target.value;
-        updateCreateButton();
-    });
-    document.getElementById('clientEmail').addEventListener('input', e => {
-        clientEmail = e.target.value;
-        updateCreateButton();
-    });
-    document.getElementById('clientDUI').addEventListener('input', e => {
-        clientDUI = e.target.value;
-        updateCreateButton();
-    });
-    document.getElementById('clientPhone').addEventListener('input', e => {
-        clientPhone = e.target.value;
-        updateCreateButton();
-    });
+    const firstNameEl = document.getElementById('first_name');
+    const lastNameEl = document.getElementById('last_name');
+    const emailEl = document.getElementById('email');
+    const duiEl = document.getElementById('dui');
+    const phoneEl = document.getElementById('phone');
+
+    if(firstNameEl) {
+        firstNameEl.addEventListener('input', e => {
+            clientFirstName = e.target.value;
+            updateCreateButton();
+        });
+    }
+    if(lastNameEl) {
+        lastNameEl.addEventListener('input', e => {
+            clientLastName = e.target.value;
+            updateCreateButton();
+        });
+    }
+    if(emailEl) {
+        emailEl.addEventListener('input', e => {
+            clientEmail = e.target.value;
+            updateCreateButton();
+        });
+    }
+    if(duiEl) {
+        duiEl.addEventListener('input', e => {
+            clientDUI = e.target.value;
+            updateCreateButton();
+        });
+    }
+    if(phoneEl) {
+        phoneEl.addEventListener('input', e => {
+            clientPhone = e.target.value;
+            updateCreateButton();
+        });
+    }
+    
     renderAll();
 });
