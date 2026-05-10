@@ -43,41 +43,62 @@ def guardar_pedido():
 
     try:
         datos = request.get_json()
-        cliente_datos = datos["cliente"]
-        carrito = datos["carrito"]
-
+        tipo = datos.get("tipo", "")
         libro = cliente_gs.open_by_key(HOJA_ID)
         
-        # Obtener la hoja exacta (mayúsculas/minúsculas exactas)
-        try:
-            hoja = libro.worksheet("SALIDA") # Intentar obtener la hoja "SALIDA"
-        except gspread.exceptions.WorksheetNotFound:
-            # Si no existe, la crea con el nombre "SALIDA"
-            hoja = libro.add_worksheet(title="SALIDA", rows="1000", cols="20")
-            hoja.append_row(["Fecha", "Nombre", "Apellido", "Email", "DUI", "Teléfono", "Producto", "Precio", "Cantidad", "Subtotal"])
-
-        fecha = datetime.now().strftime("%Y-%m-%d")
-
-        for item in carrito:
-            precio_val = max(0, float(item.get("precio", 0)))
-            cantidad_val = max(1, int(item.get("cantidad", 1)))
-            subtotal_val = precio_val * cantidad_val
-
+        if tipo == "ALMACEN":
+            bodega_num = datos.get("bodega", "")
+            nombre_hoja = f"BODEGA{bodega_num}"
+            
+            try:
+                hoja = libro.worksheet(nombre_hoja)
+            except gspread.exceptions.WorksheetNotFound:
+                # Si no existe, la crea
+                hoja = libro.add_worksheet(title=nombre_hoja, rows="1000", cols="5")
+                hoja.append_row(["Fecha", "Producto", "Cantidad"])
+                
             fila = [
-                fecha,
-                cliente_datos.get("firstname", ""),
-                cliente_datos.get("lastname", ""),
-                cliente_datos.get("email", ""),
-                cliente_datos.get("dui", ""),
-                cliente_datos.get("telefono", ""),
-                item.get("nombre", ""),
-                precio_val,
-                cantidad_val,
-                subtotal_val
+                datos.get("fecha", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                datos.get("producto", ""),
+                datos.get("cantidad", 0)
             ]
             hoja.append_row(fila)
+            return jsonify({"success": True})
+            
+        else:
+            cliente_datos = datos.get("cliente", {})
+            carrito = datos.get("carrito", [])
 
-        return jsonify({"success": True})
+            # Obtener la hoja exacta (mayúsculas/minúsculas exactas)
+            try:
+                hoja = libro.worksheet("SALIDA") # Intentar obtener la hoja "SALIDA"
+            except gspread.exceptions.WorksheetNotFound:
+                # Si no existe, la crea con el nombre "SALIDA"
+                hoja = libro.add_worksheet(title="SALIDA", rows="1000", cols="20")
+                hoja.append_row(["Fecha", "Nombre", "Apellido", "Email", "DUI", "Teléfono", "Producto", "Precio", "Cantidad", "Subtotal"])
+
+            fecha = datetime.now().strftime("%Y-%m-%d")
+
+            for item in carrito:
+                precio_val = max(0, float(item.get("precio", 0)))
+                cantidad_val = max(1, int(item.get("cantidad", 1)))
+                subtotal_val = precio_val * cantidad_val
+
+                fila = [
+                    fecha,
+                    cliente_datos.get("firstname", ""),
+                    cliente_datos.get("lastname", ""),
+                    cliente_datos.get("email", ""),
+                    cliente_datos.get("dui", ""),
+                    cliente_datos.get("telefono", ""),
+                    item.get("nombre", ""),
+                    precio_val,
+                    cantidad_val,
+                    subtotal_val
+                ]
+                hoja.append_row(fila)
+
+            return jsonify({"success": True})
     except Exception as e:
         # Capturar cualquier error y mostrarlo
         mensaje = str(e)
