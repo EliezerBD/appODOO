@@ -2,3 +2,4 @@
 credenciales.json
 *.json
 !vercel.json
+!manifest.json

@@ -1,0 +1,20 @@
+{
+  "name": "InventarioApp - CRM",
+  "short_name": "Inventario",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "icons": [
+    {
+      "src": "PNG/carpecta.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "PNG/carpecta.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
