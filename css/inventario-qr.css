@@ -208,7 +208,7 @@ body {
     width: 100%;
     border: none;
     border-bottom: 1px solid #515151;
-    background: #8c909f;
+    background: #3d3e42;
     color: #ffffff;
     border-radius: 4px 4px 0 0;
 }
@@ -419,7 +419,7 @@ input[type=number]::-webkit-outer-spin-button {
     pointer-events: none;
     transition: 300ms;
     z-index: 40;
-    box-shadow: 0 10px 20px  #00d4ff;
+    box-shadow: 0 10px 20px #00d4ff;
     border: 1px solid #333;
 }
 
