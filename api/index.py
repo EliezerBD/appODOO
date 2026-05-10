@@ -45,16 +45,27 @@ def sanitizar_para_sheets(valor):
 # ------------------------------------------------------------
 @app.route("/api/get-apikey", methods=["GET"])
 def get_apikey():
-    # Permitir solo peticiones desde dominios autorizados
+    # Obtener los encabezados
     origen = request.headers.get("Origin", "")
+    referer = request.headers.get("Referer", "")
+
+    # Dominios permitidos para Origin (tu dominio principal y preview)
     dominios_permitidos = [
         "https://app-odoo.vercel.app",
-        "https://app-odoo-git-main-eliezerbd.vercel.app"  # ajusta según tu preview real
+        "https://app-odoo-git-main-eliezerbd.vercel.app"
     ]
-    # También acepta si no hay Origin (ej. peticiones directas del backend)
-    if not origen or origen not in dominios_permitidos:
-        return jsonify({"error": "No autorizado"}), 403
-    return jsonify({"apiKey": API_SECRET})
+
+    # Permitir si el Origin coincide exactamente
+    if origen in dominios_permitidos:
+        return jsonify({"apiKey": API_SECRET})
+
+    # Si no hay Origin, confiamos en el Referer: debe contener tu dominio
+    if not origen and referer:
+        if "app-odoo.vercel.app" in referer or "eliezerbd.vercel.app" in referer:
+            return jsonify({"apiKey": API_SECRET})
+
+    # Cualquier otro caso (curl sin Referer, otro dominio, etc.) es rechazado
+    return jsonify({"error": "No autorizado"}), 403
 # ------------------------------------------------------------
 # ENDPOINT PRINCIPAL (con protección de API Key)
 # ------------------------------------------------------------
