@@ -1,6 +1,19 @@
 // ==================== CONFIGURACIÓN DEL BACKEND ====================
 const GOOGLE_SHEET_URL = '/api/submit';
 
+
+// ==================== API KEY DINÁMICA (OCULTA) ====================
+let API_KEY = '';
+
+async function obtenerApiKey() {
+    try {
+        const response = await fetch('/api/get-apikey');
+        const data = await response.json();
+        API_KEY = data.apiKey;
+    } catch (error) {
+        console.error('Error obteniendo API Key');
+    }
+}
 // ==================== MODELOS ====================
 class Product {
     constructor(id, name, price, tax = 0, code = '') {
@@ -316,7 +329,7 @@ async function createDraftOrder() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-API-Key': '44#,%:cSQ_mH[mXUFM|e<:pg6!ME<f&oqoh88I2mUbLri' // Reemplaza con tu clave real
+                'X-API-Key': API_KEY // Reemplaza con tu clave real
             },
             body: JSON.stringify(datos)
         });
@@ -416,7 +429,7 @@ async function submitStock() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'X-API-Key': '44#,%:cSQ_mH[mXUFM|e<:pg6!ME<f&oqoh88I2mUbLri' // Reemplaza con tu clave real
+                'X-API-Key': API_KEY // Reemplaza con tu clave real
              },
             body: JSON.stringify(datos)
         });
@@ -461,6 +474,8 @@ window.saveCustomer = function() {
 
 // ==================== INICIALIZACIÓN ====================
 window.addEventListener('load', () => {
+    obtenerApiKey();
+
     const firstNameEl = document.getElementById('first_name');
     const lastNameEl = document.getElementById('last_name');
     const emailEl = document.getElementById('email');

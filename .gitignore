@@ -3,3 +3,5 @@ credenciales.json
 *.json
 !vercel.json
 !manifest.json
+COEWEB/
+frotend2.html

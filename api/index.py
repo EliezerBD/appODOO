@@ -51,6 +51,16 @@ def sanitizar_para_sheets(valor):
 # ------------------------------------------------------------
 # ENDPOINT PRINCIPAL
 # ------------------------------------------------------------
+@app.route("/api/get-apikey", methods=["GET"])
+def get_apikey():
+    # Verificar que la petición viene de tu dominio
+    origen = request.headers.get("Origin", "")
+    if origen != DOMINIO_PERMITIDO:
+        return jsonify({"error": "No autorizado"}), 403
+    
+    # Devolver la clave (el frontend la usará en memoria)
+    return jsonify({"apiKey": API_SECRET})
+
 @app.route("/api/submit", methods=["POST", "OPTIONS"])
 def guardar_pedido():
     # Respuesta automática a la petición preflight CORS
@@ -93,7 +103,6 @@ def guardar_pedido():
             ]
             hoja.append_row(fila)
             return jsonify({"success": True})
-
         # ---------------------------
         # CASO: PEDIDO DE CLIENTE
         # ---------------------------
