@@ -7,11 +7,14 @@ let API_KEY = '';
 
 async function obtenerApiKey() {
     try {
+        showLoader('Iniciando...');
         const response = await fetch('/api/get-apikey');
         const data = await response.json();
         API_KEY = data.apiKey;
     } catch (error) {
         console.error('Error obteniendo API Key');
+    } finally {
+        hideLoader();
     }
 }
 // ==================== MODELOS ====================
@@ -44,6 +47,18 @@ function showToast(msg) {
     toast.textContent = msg;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 2600);
+}
+
+function showLoader(text = 'Procesando...') {
+    const overlay = document.getElementById('loader-overlay');
+    const textEl = overlay.querySelector('.loader-text');
+    if (textEl) textEl.textContent = text;
+    overlay.style.display = 'flex';
+}
+
+function hideLoader() {
+    const overlay = document.getElementById('loader-overlay');
+    overlay.style.display = 'none';
 }
 
 function flashEffect() {
@@ -305,8 +320,8 @@ async function createDraftOrder() {
 
     const btn = document.getElementById('btnCreateOrder');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<span>Enviando...</span><span class="material-symbols-outlined animate-spin">sync</span>';
     btn.disabled = true;
+    showLoader('Enviando pedido...');
 
     const datos = {
         cliente: {
@@ -356,6 +371,7 @@ async function createDraftOrder() {
         console.error(error);
         showToast('⚠️ Sin respuesta del servidor. Verifica tu conexión, pero los datos podrían haberse guardado. Revisa la hoja.');
     } finally {
+        hideLoader();
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
@@ -413,8 +429,8 @@ async function submitStock() {
 
     const btn = document.querySelector('#almacenForm button');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<span>Enviando...</span><span class="material-symbols-outlined animate-spin">sync</span>';
     btn.disabled = true;
+    showLoader('Registrando stock...');
 
     const datos = {
         tipo: 'ALMACEN',
@@ -457,6 +473,7 @@ async function submitStock() {
         console.error(error);
         showToast('⚠️ Error de conexión. Revisa el backend.');
     } finally {
+        hideLoader();
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
